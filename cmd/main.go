@@ -17,6 +17,10 @@ func main() {
 		panic(err)
 	}
 
+	if err := db.RunMigrations(); err != nil {
+		panic(err)
+	}
+
 	//Camadda de repository
 	ProductRepository := repository.NewProductRepository(dbConnection)
 	//Camada de usecase
