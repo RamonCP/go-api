@@ -124,3 +124,30 @@ func (pr *ProductRepository) UpdateProduct(product model.Product) (*model.Produc
 
 	return &product, nil
 }
+
+func (pr *ProductRepository) DeleteProduct(id int) (bool, error) {
+	query, err := pr.connection.Prepare("DELETE FROM product WHERE id = $1")
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+	defer query.Close()
+
+	result, err := query.Exec(id)
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+
+	if rowsAffected == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
