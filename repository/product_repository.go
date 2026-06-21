@@ -37,7 +37,7 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 
 		if err != nil {
 			fmt.Println(err)
-		return []model.Product{}, err
+			return []model.Product{}, err
 		}
 
 		productList = append(productList, productObj)
@@ -51,7 +51,7 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
 
 	var id int
-	query, err := pr.connection.Prepare("INSERT INTO product" +
+	query, err := pr.connection.Prepare("INSERT INTO product " +
 	"(product_name, price)" +
 	" VALUES ($1, $2) RETURNING id")
 
@@ -92,5 +92,35 @@ func (pr *ProductRepository) GetProductById(id_product int) (*model.Product, err
 	}
 
 	query.Close()
+	return &product, nil
+}
+
+func (pr *ProductRepository) UpdateProduct(product model.Product) (*model.Product, error) {
+	query, err := pr.connection.Prepare("UPDATE product SET " + 
+	"product_name = $1, price = $2 " + 
+	"WHERE id = $3")
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer query.Close()
+
+	result, err := query.Exec(product.Name, product.Price, product.ID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil { 
+		return nil, err 
+	}
+
+	if rowsAffected == 0 {
+		return nil, fmt.Errorf("Produto não encontrado")
+	}
+
 	return &product, nil
 }
