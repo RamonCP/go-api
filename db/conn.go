@@ -3,22 +3,28 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
 const (
-	host = "localhost"
-	// host = "go_db" // usar dentro do Docker
-	port = 5432
-	user = "postgres"
+	port     = 5432
+	user     = "postgres"
 	password = "1234"
-	dbname = "postgres"
+	dbname   = "postgres"
 )
+
+func getHost() string {
+	if h := os.Getenv("DB_HOST"); h != "" {
+		return h
+	}
+	return "localhost"
+}
 
 func ConnectDB() (*sql.DB, error) {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-	host, port, user, password, dbname)
+		getHost(), port, user, password, dbname)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	

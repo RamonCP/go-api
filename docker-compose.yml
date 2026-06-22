@@ -7,6 +7,8 @@ services:
     build: .
     ports:
       - "8000:8000"
+    environment:
+      - DB_HOST=go_db
     depends_on:
       - go_db
   go_db:

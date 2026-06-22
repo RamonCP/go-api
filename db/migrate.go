@@ -18,7 +18,7 @@ func RunMigrations() error {
 		return err
 	}
 
-	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", user, password, host, port, dbname)
+	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", user, password, getHost(), port, dbname)
 
 	m, err := migrate.NewWithSourceInstance("iofs", d, dbURL)
 	if err != nil {
