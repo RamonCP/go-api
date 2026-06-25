@@ -26,6 +26,8 @@ func main() {
 	server := gin.Default()
 	server.GET("/products", handler.GetProducts)
 	server.GET("/product/:id", handler.GetProductById)
+	server.POST("/product", handler.CreateProduct)
+	server.DELETE("/product/:id", handler.DeleteProduct)
 
 	server.Run(":8000")
 }

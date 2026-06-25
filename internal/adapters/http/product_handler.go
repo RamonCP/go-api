@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+	"go-api/internal/core/domain"
 	"go-api/internal/core/ports"
 	"net/http"
 	"strconv"
@@ -50,4 +52,41 @@ func (h *productHandler) GetProductById(ctx *gin.Context) {
 	response := toProductResponse(product)
 
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *productHandler) CreateProduct(ctx *gin.Context) {
+	var product domain.Product
+	err := ctx.BindJSON(&product)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, "Body inválido")
+		return
+	}
+
+	product, err = h.service.CreateProduct(product)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, product)
+}
+
+func (h *productHandler) DeleteProduct(ctx *gin.Context) {
+	id_param := ctx.Param("id")
+	id, err := strconv.Atoi(id_param)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, "Id inválido")
+		return
+	}
+
+	err = h.service.DeleteProduct(id)
+	fmt.Println("DeleteProduct: ", err)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, "Erro ao deletar produto")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Produto deletado com sucesso")
 }

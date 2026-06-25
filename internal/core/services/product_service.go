@@ -23,3 +23,11 @@ func (s *productService) GetProducts() ([]domain.Product, error) {
 func (s *productService) GetProductById(id int) (domain.Product, error) {
 	return s.repo.GetProductById(id)
 }
+
+func (s *productService) CreateProduct(product domain.Product) (domain.Product, error) {
+	return s.repo.CreateProduct(product)
+}
+
+func (s *productService) DeleteProduct(id int) error {
+	return s.repo.DeleteProduct(id)
+}

@@ -67,3 +67,57 @@ func (pr *ProductRepository) GetProductById(id int) (domain.Product, error) {
 
 	return productObj, nil
 }
+
+func (pr *ProductRepository) CreateProduct(product domain.Product) (domain.Product, error) {
+	query, err := pr.connection.Prepare("INSERT INTO product (product_name, price) VALUES($1, $2) RETURNING id")
+
+	if err != nil {
+		fmt.Println(err)
+		return domain.Product{}, err
+	}
+
+	defer query.Close()
+
+	var id int
+	err = query.QueryRow(product.Name, product.Price).Scan(&id)
+
+	if err != nil {
+		fmt.Println(err)
+		return domain.Product{}, err
+	}
+
+	return domain.Product{
+		ID: id,
+		Name: product.Name,
+		Price: product.Price,
+	}, nil
+}
+
+func (pr *ProductRepository) DeleteProduct(id int) error {
+	query, err := pr.connection.Prepare("DELETE FROM product WHERE id = $1")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	defer query.Close()
+
+	result, err := query.Exec(id)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	if rowsAffected == 0 {
+		fmt.Println(err)
+		return fmt.Errorf("Produto com id não encontrado")
+	}
+
+	return nil
+}
