@@ -31,3 +31,7 @@ func (s *productService) CreateProduct(product domain.Product) (domain.Product, 
 func (s *productService) DeleteProduct(id int) error {
 	return s.repo.DeleteProduct(id)
 }
+
+func (s *productService) UpdateProduct(product domain.Product, id int) (domain.Product, error) {
+	return s.repo.UpdateProduct(product, id)
+}

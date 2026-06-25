@@ -7,4 +7,5 @@ type ProductRepository interface {
 	GetProductById(id int) (domain.Product, error)
 	CreateProduct(product domain.Product) (domain.Product, error)
 	DeleteProduct(id int) error
+	UpdateProduct(product domain.Product, id int) (domain.Product, error)
 }

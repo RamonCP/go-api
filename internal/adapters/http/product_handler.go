@@ -90,3 +90,27 @@ func (h *productHandler) DeleteProduct(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, "Produto deletado com sucesso")
 }
+
+func (h *productHandler) UpdateProduct(ctx *gin.Context) {
+	id_param := ctx.Param("id")
+	id, err := strconv.Atoi(id_param)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, "Id inválido")
+		return
+	}
+
+	var product domain.Product
+	err = ctx.BindJSON(&product)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, "Body inválido")
+		return
+	}
+
+	product, err = h.service.UpdateProduct(product, id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, "Erro ao atualizar produto")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, product)
+}
