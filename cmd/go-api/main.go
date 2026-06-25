@@ -25,5 +25,7 @@ func main() {
 
 	server := gin.Default()
 	server.GET("/products", handler.GetProducts)
+	server.GET("/product/:id", handler.GetProductById)
+
 	server.Run(":8000")
 }
