@@ -1,0 +1,71 @@
+name: CI
+
+# Quando o pipeline roda: em todo push na main e em todo pull request.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Menor privilégio: o CI só precisa ler o repositório (não publica nada ainda).
+permissions:
+  contents: read
+
+jobs:
+  # ── Job 1 — Lint: qualidade estática com golangci-lint ──────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod # versão vem do go.mod (fonte única da verdade)
+          cache: true # cacheia ~/go/pkg/mod entre execuções
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.12.2 # pinada para builds reproduzíveis
+
+  # ── Job 2 — Test: vet + testes unitários ────────────────────────────
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./... -v # hoje é no-op (sem testes); fica pronto para quando existirem
+
+  # ── Job 3 — Docker: valida que a imagem multi-stage builda ──────────
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (multi-stage, sem push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false # nesta fase só validamos o build; o push fica para o CD
+          tags: go-api:ci
+          cache-from: type=gha # reaproveita camadas do cache do GitHub Actions
+          cache-to: type=gha,mode=max

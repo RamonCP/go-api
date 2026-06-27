@@ -1,0 +1,12 @@
+# golangci-lint v2 — config explícita do pipeline.
+# Docs: https://golangci-lint.run
+version: "2"
+
+linters:
+  # "standard" habilita o conjunto padrão e recomendado:
+  #   errcheck    — erros retornados que não são verificados
+  #   govet       — análises do próprio Go (mesmo que `go vet`)
+  #   ineffassign — atribuições a variáveis que nunca são lidas
+  #   staticcheck — análises estáticas avançadas (bugs + simplificações)
+  #   unused      — código (funções, vars, consts) não utilizado
+  default: standard
