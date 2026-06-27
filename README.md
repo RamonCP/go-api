@@ -30,6 +30,7 @@ O projeto aplica **Arquitetura Hexagonal**, organizando o código em três camad
 go-api/
 ├── cmd/go-api/          # Ponto de entrada — wiring de dependências (DI manual)
 └── internal/
+    ├── config/         # Carrega configuração de variáveis de ambiente
     ├── core/            # Núcleo isolado de qualquer framework
     │   ├── domain/      # Modelos de domínio (Product)
     │   ├── ports/       # Interfaces: driving (entrada) e driven (saída)
@@ -68,6 +69,22 @@ Base URL: `http://localhost:8000`
   "price": 1999.9
 }
 ```
+
+## Configuração
+
+A aplicação lê toda a configuração de **variáveis de ambiente**, com defaults voltados ao desenvolvimento local — então roda sem configuração nenhuma na sua máquina. A leitura é centralizada em `internal/config`.
+
+| Variável      | Default     | Descrição                                                 |
+| ------------- | ----------- | --------------------------------------------------------- |
+| `PORT`        | `8000`      | Porta do servidor HTTP                                    |
+| `DB_HOST`     | `localhost` | Host do PostgreSQL                                        |
+| `DB_PORT`     | `5432`      | Porta do PostgreSQL                                       |
+| `DB_USER`     | `postgres`  | Usuário do banco                                          |
+| `DB_PASSWORD` | `1234`      | Senha do banco                                            |
+| `DB_NAME`     | `postgres`  | Nome do banco                                             |
+| `DB_SSLMODE`  | `disable`   | Modo TLS da conexão (use `require` em bancos gerenciados) |
+
+Use o [`.env.example`](.env.example) como modelo: copie para `.env` (gitignorado) e ajuste o que precisar. Segredos reais **nunca** são commitados — o `.env` fica fora do git.
 
 ## Como Rodar
 
@@ -113,7 +130,7 @@ curl -X DELETE http://localhost:8000/product/1
 
 ### 3. Rodar localmente (sem Docker)
 
-Requer Go 1.25+ e um PostgreSQL local rodando na porta 5432 com usuário `postgres` e senha `1234`.
+Requer Go 1.25+ e um PostgreSQL local rodando na porta 5432 (com os defaults da seção [Configuração](#configuração), ou ajuste via variáveis de ambiente).
 
 ```bash
 # Instalar dependências
@@ -194,7 +211,7 @@ Este lab está em evolução. Os experimentos planejados para as próximas itera
 
 - [x] **Testes unitários** — cobrir o `core/services` com mocks das interfaces de repositório, demonstrando um dos maiores benefícios da arquitetura hexagonal
 - [ ] **Testes de integração** — testar os adapters (HTTP handlers e repositório Postgres) com banco real
-- [ ] **Variáveis de ambiente** — externalizar credenciais do banco (atualmente hardcoded) via `.env` ou flags de configuração
+- [x] **Variáveis de ambiente** — externalizar credenciais do banco (atualmente hardcoded) via `.env` ou flags de configuração
 - [x] **Dockerfile multi-stage** — reduzir o tamanho da imagem final separando build e runtime
 - [ ] **Middleware de logging** — adicionar logs estruturados com `slog` (stdlib) ou `zerolog`
 - [x] **Health check endpoint** — `GET /health` para verificação de disponibilidade da API e do banco
