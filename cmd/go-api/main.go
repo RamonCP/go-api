@@ -22,8 +22,12 @@ func main() {
 	service := services.NewProductService(repo)
 	handler := httpadapter.NewProductHandler(service)
 
+	healthRepo := postgres.NewHealthRepository(dbConnection)
+	healthService := services.NewHealthService(healthRepo)
+	healthHandler := httpadapter.NewHealthHandler(healthService)
 
 	server := gin.Default()
+	server.GET("/health", healthHandler.CheckHealth)
 	server.GET("/products", handler.GetProducts)
 	server.GET("/product/:id", handler.GetProductById)
 	server.POST("/product", handler.CreateProduct)

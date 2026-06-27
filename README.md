@@ -51,6 +51,7 @@ Base URL: `http://localhost:8000`
 
 | Método   | Rota           | Descrição                     |
 | -------- | -------------- | ----------------------------- |
+| `GET`    | `/health`      | Readiness: API + banco (`200`/`503`) |
 | `GET`    | `/products`    | Lista todos os produtos       |
 | `GET`    | `/product/:id` | Busca produto por ID          |
 | `POST`   | `/product`     | Cria um novo produto          |
@@ -136,9 +137,9 @@ Este lab está em evolução. Os experimentos planejados para as próximas itera
 - [ ] **Testes unitários** — cobrir o `core/services` com mocks das interfaces de repositório, demonstrando um dos maiores benefícios da arquitetura hexagonal
 - [ ] **Testes de integração** — testar os adapters (HTTP handlers e repositório Postgres) com banco real
 - [ ] **Variáveis de ambiente** — externalizar credenciais do banco (atualmente hardcoded) via `.env` ou flags de configuração
-- [ ] **Dockerfile multi-stage** — reduzir o tamanho da imagem final separando build e runtime
+- [x] **Dockerfile multi-stage** — reduzir o tamanho da imagem final separando build e runtime
 - [ ] **Middleware de logging** — adicionar logs estruturados com `slog` (stdlib) ou `zerolog`
-- [ ] **Health check endpoint** — `GET /health` para verificação de disponibilidade da API e do banco
+- [x] **Health check endpoint** — `GET /health` para verificação de disponibilidade da API e do banco
 - [ ] **Segundo adapter de saída** — implementar um repositório em memória para comparar com o Postgres sem mudar nada no `core`
 - [ ] **OpenAPI/Swagger** — documentar os endpoints com `swaggo/swag`
 - [ ] **CI com GitHub Actions** — pipeline de build, lint e testes automatizados

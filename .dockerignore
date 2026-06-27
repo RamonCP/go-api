@@ -1,0 +1,11 @@
+# Contexto de build enxuto: nada aqui é necessário para compilar o binário.
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+*.md
+*.log
+.env
+.vscode
+.idea
