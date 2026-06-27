@@ -8,7 +8,16 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_HOST=go_db
+      # Config injetada via ambiente (12-factor): a mesma imagem roda em
+      # qualquer lugar, mudando só estas variáveis. Os valores reais vêm do
+      # arquivo .env (gitignorado); o ":-default" é só fallback de dev local.
+      - PORT=${PORT:-8000}
+      - DB_HOST=go_db # nome do serviço do banco na rede do compose (fixo)
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-1234}
+      - DB_NAME=${DB_NAME:-postgres}
+      - DB_SSLMODE=${DB_SSLMODE:-disable}
     depends_on:
       go_db:
         # Só sobe a app quando o Postgres estiver realmente pronto (healthy),
@@ -24,15 +33,16 @@ services:
     container_name: go_db
     image: postgres:12
     environment:
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      # Mesma fonte de verdade do go-app: sem duplicar valores.
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-1234}
+      POSTGRES_DB: ${DB_NAME:-postgres}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-postgres}"]
       interval: 5s
       timeout: 3s
       retries: 5

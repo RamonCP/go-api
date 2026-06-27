@@ -3,18 +3,21 @@ package main
 import (
 	httpadapter "go-api/internal/adapters/http"
 	"go-api/internal/adapters/postgres"
+	"go-api/internal/config"
 	"go-api/internal/core/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	dbConnection, err := postgres.ConnectDB()
+	cfg := config.Load()
+
+	dbConnection, err := postgres.ConnectDB(cfg.Database.DSN())
 	if err != nil {
 		panic(err)
 	}
 
-	if err := postgres.RunMigrations(); err != nil {
+	if err := postgres.RunMigrations(cfg.Database.URL()); err != nil {
 		panic(err)
 	}
 
@@ -34,7 +37,7 @@ func main() {
 	server.DELETE("/product/:id", handler.DeleteProduct)
 	server.PUT("/product/:id", handler.UpdateProduct)
 
-	if err := server.Run(":8000"); err != nil {
+	if err := server.Run(":" + cfg.Server.Port); err != nil {
 		panic(err)
 	}
 }

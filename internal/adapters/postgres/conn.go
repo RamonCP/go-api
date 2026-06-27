@@ -3,41 +3,22 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
 	_ "github.com/lib/pq"
 )
 
-const (
-	port     = 5432
-	user     = "postgres"
-	password = "1234"
-	dbname   = "postgres"
-)
-
-func getHost() string {
-	if h := os.Getenv("DB_HOST"); h != "" {
-		return h
-	}
-	return "localhost"
-}
-
-func ConnectDB() (*sql.DB, error) {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		getHost(), port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	
+// ConnectDB abre a conexão com o PostgreSQL a partir de uma DSN e valida que o
+// banco responde com um Ping. A construção da DSN fica a cargo de quem chama
+// (a camada de config), mantendo este adapter sem conhecer variáveis de ambiente.
+func ConnectDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("abrindo conexão com o banco: %w", err)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		panic(err)
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("verificando conexão com o banco (ping): %w", err)
 	}
-
-	fmt.Println("Connected to " + dbname)
 
 	return db, nil
 }

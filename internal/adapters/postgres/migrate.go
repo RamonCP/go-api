@@ -12,15 +12,13 @@ import (
 //go:embed migrations
 var migrationsFS embed.FS
 
-func RunMigrations() error {
+func RunMigrations(databaseURL string) error {
 	d, err := iofs.New(migrationsFS, "migrations")
 	if err != nil {
 		return err
 	}
 
-	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", user, password, getHost(), port, dbname)
-
-	m, err := migrate.NewWithSourceInstance("iofs", d, dbURL)
+	m, err := migrate.NewWithSourceInstance("iofs", d, databaseURL)
 	if err != nil {
 		return err
 	}

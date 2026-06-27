@@ -1,0 +1,10 @@
+# Variáveis de ambiente com segredos reais (use o .env.example como modelo)
+.env
+
+# Binários compilados
+/main
+go-api
+
+# Artefatos de cobertura de teste
+*.out
+coverage.html
