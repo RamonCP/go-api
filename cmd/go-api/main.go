@@ -34,5 +34,7 @@ func main() {
 	server.DELETE("/product/:id", handler.DeleteProduct)
 	server.PUT("/product/:id", handler.UpdateProduct)
 
-	server.Run(":8000")
+	if err := server.Run(":8000"); err != nil {
+		panic(err)
+	}
 }

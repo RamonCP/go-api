@@ -43,7 +43,7 @@ func (pr *ProductRepository) GetProducts() ([]domain.Product, error) {
 		productList = append(productList, productObj)
 	}
 
-	rows.Close()
+	_ = rows.Close()
 
 	return productList, nil
 }
@@ -55,7 +55,7 @@ func (pr *ProductRepository) GetProductById(id int) (domain.Product, error) {
 		return domain.Product{}, err
 	}
 
-	defer query.Close()
+	defer func() { _ = query.Close() }()
 
 	var productObj domain.Product
 	err = query.QueryRow(id).Scan(&productObj.ID, &productObj.Name, &productObj.Price)
@@ -76,7 +76,7 @@ func (pr *ProductRepository) CreateProduct(product domain.Product) (domain.Produ
 		return domain.Product{}, err
 	}
 
-	defer query.Close()
+	defer func() { _ = query.Close() }()
 
 	var id int
 	err = query.QueryRow(product.Name, product.Price).Scan(&id)
@@ -100,7 +100,7 @@ func (pr *ProductRepository) DeleteProduct(id int) error {
 		return err
 	}
 
-	defer query.Close()
+	defer func() { _ = query.Close() }()
 
 	result, err := query.Exec(id)
 	if err != nil {
@@ -116,7 +116,7 @@ func (pr *ProductRepository) DeleteProduct(id int) error {
 
 	if rowsAffected == 0 {
 		fmt.Println(err)
-		return fmt.Errorf("Produto com id não encontrado")
+		return fmt.Errorf("produto com id não encontrado")
 	}
 
 	return nil
