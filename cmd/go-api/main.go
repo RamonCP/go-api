@@ -5,8 +5,10 @@ import (
 	"go-api/internal/adapters/postgres"
 	"go-api/internal/config"
 	"go-api/internal/core/services"
+	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
@@ -29,15 +31,18 @@ func main() {
 	healthService := services.NewHealthService(healthRepo)
 	healthHandler := httpadapter.NewHealthHandler(healthService)
 
-	server := gin.Default()
-	server.GET("/health", healthHandler.CheckHealth)
-	server.GET("/products", handler.GetProducts)
-	server.GET("/product/:id", handler.GetProductById)
-	server.POST("/product", handler.CreateProduct)
-	server.DELETE("/product/:id", handler.DeleteProduct)
-	server.PUT("/product/:id", handler.UpdateProduct)
+	router := chi.NewRouter()
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
 
-	if err := server.Run(":" + cfg.Server.Port); err != nil {
+	router.Get("/health", healthHandler.CheckHealth)
+	router.Get("/products", handler.GetProducts)
+	router.Get("/product/{id}", handler.GetProductById)
+	router.Post("/product", handler.CreateProduct)
+	router.Delete("/product/{id}", handler.DeleteProduct)
+	router.Put("/product/{id}", handler.UpdateProduct)
+
+	if err := http.ListenAndServe(":"+cfg.Server.Port, router); err != nil {
 		panic(err)
 	}
 }
