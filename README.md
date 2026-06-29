@@ -13,7 +13,7 @@ O domínio é simples de propósito: um CRUD de produtos, para que a atenção f
 | Tecnologia         | Papel no projeto                             |
 | ------------------ | -------------------------------------------- |
 | **Go 1.25**        | Linguagem principal                          |
-| **Gin**            | Framework HTTP (adapter de entrada)          |
+| **Chi**            | Roteador HTTP (adapter de entrada)           |
 | **PostgreSQL 12**  | Banco de dados relacional (adapter de saída) |
 | **lib/pq**         | Driver Go para PostgreSQL                    |
 | **golang-migrate** | Migrations de banco de dados versionadas     |
@@ -36,14 +36,14 @@ go-api/
     │   ├── ports/       # Interfaces: driving (entrada) e driven (saída)
     │   └── services/    # Regras de negócio (use cases)
     └── adapters/
-        ├── http/        # Adapter primário: handlers Gin + DTOs
+        ├── http/        # Adapter primário: handlers Chi + DTOs
         └── postgres/    # Adapter secundário: repositório SQL + migrations
 ```
 
 **Fluxo de uma requisição:**
 
 ```
-HTTP Request → Gin Handler → ProductService (interface) → ProductRepository (interface) → PostgreSQL
+HTTP Request → Chi Handler → ProductService (interface) → ProductRepository (interface) → PostgreSQL
 ```
 
 O `core` nunca importa `adapters`. Os adapters implementam interfaces definidas em `ports`, tornando toda a camada central testável sem banco de dados ou HTTP real.
